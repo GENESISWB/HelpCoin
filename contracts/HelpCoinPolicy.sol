@@ -15,16 +15,6 @@ interface HelpCoin {
 interface IOracle {
     function getData() external returns (uint256, bool);
 }
-
-/**
- * @title HelpCoin Monetary Supply Policy
- * @dev This is an implementation of the HelpCoin Ideal Money protocol.
- *      HelpCoin operates symmetrically on expansion and contraction. It will both split and
- *      combine coins to maintain a stable unit price.
- *
- *      This component regulates the token supply of the HelpCoin ERC20 token in response to
- *      market oracles.
- */
 contract HelpCoinPolicy is Ownable {
     using SafeMath for uint256;
     using SafeMathInt for int256;
@@ -143,66 +133,23 @@ contract HelpCoinPolicy is Ownable {
         assert(supplyAfterRebase <= MAX_SUPPLY);
         emit LogRebase(epoch, exchangeRate, cpi, supplyDelta, block.timestamp);
     }
-
-    /**
-     * @notice Sets the reference to the CPI oracle.
-     * @param cpiOracle_ The address of the cpi oracle contract.
-     */
     function setCpiOracle(IOracle cpiOracle_) external onlyOwner {
         cpiOracle = cpiOracle_;
     }
-
-    /**
-     * @notice Sets the reference to the market oracle.
-     * @param marketOracle_ The address of the market oracle contract.
-     */
     function setMarketOracle(IOracle marketOracle_) external onlyOwner {
         marketOracle = marketOracle_;
     }
-
-    /**
-     * @notice Sets the reference to the orchestrator.
-     * @param orchestrator_ The address of the orchestrator contract.
-     */
     function setOrchestrator(address orchestrator_) external onlyOwner {
         orchestrator = orchestrator_;
     }
-
-    /**
-     * @notice Sets the deviation threshold fraction. If the exchange rate given by the market
-     *         oracle is within this fractional distance from the targetRate, then no supply
-     *         modifications are made. DECIMALS fixed point number.
-     * @param deviationThreshold_ The new exchange rate threshold fraction.
-     */
+    
     function setDeviationThreshold(uint256 deviationThreshold_) external onlyOwner {
         deviationThreshold = deviationThreshold_;
     }
-
-    /**
-     * @notice Sets the rebase lag parameter.
-               It is used to dampen the applied supply adjustment by 1 / rebaseLag
-               If the rebase lag R, equals 1, the smallest value for R, then the full supply
-               correction is applied on each rebase cycle.
-               If it is greater than 1, then a correction of 1/R of is applied on each rebase.
-     * @param rebaseLag_ The new rebase lag parameter.
-     */
     function setRebaseLag(uint256 rebaseLag_) external onlyOwner {
         require(rebaseLag_ > 0);
         rebaseLag = rebaseLag_;
     }
-
-    /**
-     * @notice Sets the parameters which control the timing and frequency of
-     *         rebase operations.
-     *         a) the minimum time period that must elapse between rebase cycles.
-     *         b) the rebase window offset parameter.
-     *         c) the rebase window length parameter.
-     * @param minRebaseTimeIntervalSec_ More than this much time must pass between rebase
-     *        operations, in seconds.
-     * @param rebaseWindowOffsetSec_ The number of seconds from the beginning of
-              the rebase interval, where the rebase window begins.
-     * @param rebaseWindowLengthSec_ The length of the rebase window in seconds.
-     */
     function setRebaseTimingParameters(
         uint256 minRebaseTimeIntervalSec_,
         uint256 rebaseWindowOffsetSec_,
@@ -215,25 +162,9 @@ contract HelpCoinPolicy is Ownable {
         rebaseWindowOffsetSec = rebaseWindowOffsetSec_;
         rebaseWindowLengthSec = rebaseWindowLengthSec_;
     }
-
-    /**
-     * @notice A multi-chain AMPL interface method. The Ampleforth monetary policy contract
-     *         on the base-chain and XC-AmpleController contracts on the satellite-chains
-     *         implement this method. It atomically returns two values:
-     *         what the current contract believes to be,
-     *         the globalAmpleforthEpoch and globalAMPLSupply.
-     * @return globalAmpleforthEpoch The current epoch number.
-     * @return globalAMPLSupply The total supply at the current epoch.
-     */
     function globalAmpleforthEpochAndAMPLSupply() external view returns (uint256, uint256) {
         return (epoch, uFrags.totalSupply());
     }
-
-    /**
-     * @dev ZOS upgradable contract initialization method.
-     *      It is called at the time of contract creation to invoke parent class initializers and
-     *      initialize the contract's state variables.
-     */
     function initialize(
         address owner_,
         IHelpCoin uFrags_,
@@ -254,21 +185,12 @@ contract HelpCoinPolicy is Ownable {
         uFrags = uFrags_;
         baseCpi = baseCpi_;
     }
-
-    /**
-     * @return If the latest block timestamp is within the rebase time window it, returns true.
-     *         Otherwise, returns false.
-     */
     function inRebaseWindow() public view returns (bool) {
         return (block.timestamp.mod(minRebaseTimeIntervalSec) >= rebaseWindowOffsetSec &&
             block.timestamp.mod(minRebaseTimeIntervalSec) <
             (rebaseWindowOffsetSec.add(rebaseWindowLengthSec)));
     }
 
-    /**
-     * @return Computes the total supply adjustment in response to the exchange rate
-     *         and the targetRate.
-     */
     function computeSupplyDelta(uint256 rate, uint256 targetRate) internal view returns (int256) {
         if (withinDeviationThreshold(rate, targetRate)) {
             return 0;
@@ -282,12 +204,6 @@ contract HelpCoinPolicy is Ownable {
             );
     }
 
-    /**
-     * @param rate The current exchange rate, an 18 decimal fixed point number.
-     * @param targetRate The target exchange rate, an 18 decimal fixed point number.
-     * @return If the rate is within the deviation threshold from the target rate, returns true.
-     *         Otherwise, returns false.
-     */
     function withinDeviationThreshold(uint256 rate, uint256 targetRate)
         internal
         view
