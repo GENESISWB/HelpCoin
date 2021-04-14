@@ -4,7 +4,7 @@
 
 HelpCoin is a donation Token based on the Ethereum [whitepaper](#) 
 
-This repository is a collection of [smart contracts](http://ampleforth.org/docs) that implement the HelpCoin protocol on the Ethereum blockchain.
+This repository is a collection of [smart contracts](#) that implement the HelpCoin protocol on the Ethereum blockchain.
 
 
 ## Table of Contents
