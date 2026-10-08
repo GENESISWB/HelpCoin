@@ -12,9 +12,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install model dependencies
-        run: pip install -q numpy scikit-learn
-      - name: Run frozen ES model backtest
+      - name: Run overly simple ES backtest
         run: |
           cd tmp_backtest
-          python hidden_strategy.py
+          python simple_strategy.py
