@@ -1,0 +1,39 @@
+Frozen hidden-strategy ES/MES backtest
+Test period: 2020-2024
+Training: through 2016
+Validation/model selection: 2017-2019
+Test untouched until final run: 2020-2024
+Entry: 08:45 ET
+Size: 4 MES
+Target: +20 points
+Stop: -20 points
+One trade per eligible day
+
+Validation candidate accuracy:
+logit 51.295%
+random forest 54.922%
+hist gradient boosting 55.181%
+Selected model: hist gradient boosting
+
+OUT-OF-SAMPLE 2020-2024
+Trades: 1290
+Wins: 625
+Losses: 662
+Flats: 3
+Win rate: 48.4496%
+Loss rate: 51.3178%
+Net P&L: -$9,035.00
+Average P&L/trade: -$7.00
+Longest win streak: 8
+Longest loss streak: 9
+Max drawdown: $20,885.00
+Target hits: 515
+Stop hits: 531
+EOD exits: 244
+
+Yearly:
+2020: 258 trades, 130 wins, 128 losses, 50.39%, -$895
+2021: 258 trades, 121 wins, 137 losses, 46.90%, -$4,855
+2022: 258 trades, 142 wins, 116 losses, 55.04%, +$10,465
+2023: 257 trades, 110 wins, 145 losses, 42.80%, -$7,920
+2024: 259 trades, 122 wins, 136 losses, 47.10%, -$5,830
